@@ -14,6 +14,6 @@ class WrongPasswordException implements Exception {}
 
 class FaceBookLogInException implements Exception {}
 
-class CamPosLocNotFoundException implements Exception {}
+class SearchException implements Exception {}
 
-class CamPosLoErrorException implements Exception {}
+class EmptySearchException implements Exception {}

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:instagram/Features/Auth/View/widgets/splash_view_widgets/splash_view_body.dart';
-import '../../../../Core/Utils/Constants/auth_constants.dart';
+import '../../../../Core/Utils/Constants/k_constants.dart';
 import '../../../../Core/Utils/Functions/animated_navigation.dart';
 import '../../ViewModel/cubit/auth_cubit.dart';
-import '../home_view_or_auth_view.dart';
+import '../../../home_view_or_auth_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
       BlocProvider.of<AuthCubit>(context).goToHomeViewOrLogInView();
     });
 
-    Timer(const Duration(seconds: AuthConstants.kSplashScreenDurationInSecond),
+    Timer(const Duration(seconds: KConstants.kSplashScreenDurationInSecond),
         () {
       AnimatedNavigation()
           .navigate(widget: const HomeViewOrAuthView(), context: context);

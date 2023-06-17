@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:instagram/Core/Widgets/custom_text.dart';
 import 'package:instagram/Features/Auth/ViewModel/cubit/auth_cubit.dart';
+import 'package:instagram/Features/Instagram/View/home_view.dart';
 
-import '../../Features/Instagram/View/InstagramView/insatgram_home_view.dart';
 import '../Utils/Constants/color_constants.dart';
 import '../Utils/Functions/animated_navigation.dart';
 import '../Utils/Functions/awesome_dialog_message.dart';
@@ -42,7 +42,7 @@ class CustomButton extends StatelessWidget {
                       message: 'logged in successfully', context: context)
                   .then((value) {
                 AnimatedNavigation().navigate(
-                    widget: const InstagramHomeView(), context: context);
+                    widget: const HomeView(), context: context);
               });
             } else if (state is ErrorAuthState) {
               AwesomeDialogMessage().showErrorAwesomeDialog(

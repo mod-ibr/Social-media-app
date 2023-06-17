@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../Core/Utils/Constants/color_constants.dart';
 import '../../../../../Core/Utils/Functions/animated_navigation.dart';
- import '../../../../../Core/Widgets/custom_button.dart';
+import '../../../../../Core/Widgets/custom_button.dart';
 import '../../../../../Core/Widgets/custom_text_form_field.dart';
- import '../../../Model/auth_model.dart';
+import '../../../Model/auth_model.dart';
 import '../../../ViewModel/cubit/auth_cubit.dart';
 import '../../loginView/login_view.dart';
 
@@ -210,15 +210,15 @@ class _SignUpViewBodyState extends State<SignUpViewBody> {
                   ? ColorConstants.buttonDisableColor
                   : ColorConstants.buttonColor,
               onPress: () {
-                if (formKey.currentState!.validate()) {
-                  formKey.currentState?.save();
+                if (formKey.currentState!.validate()) {                  formKey.currentState?.save();
                   final authEntity = AuthModel(
-                      userName: userNameController.text,
-                      email: emailController.text,
-                      password: passwordController.text);
+                    userName: userNameController.text,
+                    email: emailController.text,
+                  );
 
-                  BlocProvider.of<AuthCubit>(context)
-                      .createAccount(authEntity: authEntity);
+                  BlocProvider.of<AuthCubit>(context).createAccount(
+                      authEntity: authEntity,
+                      password: passwordController.text);
                 }
               },
               tcolor: (emailController.text.isEmpty ||

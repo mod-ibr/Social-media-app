@@ -4,8 +4,8 @@ import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/Errors/exception.dart';
-import '../../../../core/Utils/Constants/auth_constants.dart';
 import '../../Features/Auth/Model/auth_model.dart';
+import '../Utils/Constants/k_constants.dart';
 
 abstract class AuthLocalServices {
   Future<AuthModel> getUserData();
@@ -25,14 +25,14 @@ class AuthLocalServicesSharedPrefes implements AuthLocalServices {
     Map<String, dynamic> authModelToJson = authModel.toJson();
 
     await sharedPreferences.setString(
-        AuthConstants.kUserData, json.encode(authModelToJson));
-    await sharedPreferences.setBool(AuthConstants.kIsUserLoggedIn, true);
+        KConstants.kUserData, json.encode(authModelToJson));
+    await sharedPreferences.setBool(KConstants.kIsUserLoggedIn, true);
     return Future.value(unit);
   }
 
   @override
   Future<AuthModel> getUserData() async {
-    final jsonString = sharedPreferences.getString(AuthConstants.kUserData);
+    final jsonString = sharedPreferences.getString(KConstants.kUserData);
     if (jsonString != null) {
       Map<String, dynamic> jsonToAuthModel =
           json.decode(jsonString) as Map<String, dynamic>;
@@ -54,14 +54,14 @@ class AuthLocalServicesSharedPrefes implements AuthLocalServices {
   @override
   Future<Unit> setIsUserLoggedIn({required bool isUserLoggedIn}) async {
     await sharedPreferences.setBool(
-        AuthConstants.kIsUserLoggedIn, isUserLoggedIn);
+        KConstants.kIsUserLoggedIn, isUserLoggedIn);
     return Future.value(unit);
   }
 
   @override
   bool? getIsUserLoggedIn() {
     final isUserLoggedIn =
-        sharedPreferences.getBool(AuthConstants.kIsUserLoggedIn);
+        sharedPreferences.getBool(KConstants.kIsUserLoggedIn);
     return isUserLoggedIn;
   }
 }

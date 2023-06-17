@@ -5,14 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../Core/Errors/exception.dart';
-import '../../../../core/Utils/Constants/auth_constants.dart';
 import '../../Features/Auth/Model/auth_model.dart';
+import '../Utils/Constants/k_constants.dart';
 
 abstract class AuthRemoteServices {
-  Future<AuthModel> getuserData();
   Future<Unit> setUserData(AuthModel authModel);
-  Future<UserCredential> createAccount(AuthModel authModel);
-  Future<UserCredential> emailAndPasswordLogIn(AuthModel authModel);
+  Future<UserCredential> createAccount(
+      {required String email, required String password});
+  Future<UserCredential> emailAndPasswordLogIn(
+      {required String email, required String password});
   Future<UserCredential> faceBookLogIn();
 
   Future<UserCredential> googleLogIn();
@@ -22,12 +23,13 @@ abstract class AuthRemoteServices {
 class AuthRemoteServicesFireBase implements AuthRemoteServices {
   late String verificationId;
   @override
-  Future<UserCredential> createAccount(AuthModel authModel) async {
+  Future<UserCredential> createAccount(
+      {required String email, required String password}) async {
     try {
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: authModel.email,
-        password: authModel.password!,
+        email: email,
+        password: password,
       );
       return credential;
     } on FirebaseAuthException catch (e) {
@@ -43,10 +45,11 @@ class AuthRemoteServicesFireBase implements AuthRemoteServices {
   }
 
   @override
-  Future<UserCredential> emailAndPasswordLogIn(AuthModel authModel) async {
+  Future<UserCredential> emailAndPasswordLogIn(
+      {required String email, required String password}) async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: authModel.email, password: authModel.password!);
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
       return credential;
     } on FirebaseAuthException catch (e) {
@@ -109,38 +112,6 @@ class AuthRemoteServicesFireBase implements AuthRemoteServices {
   }
 
   @override
-  Future<AuthModel> getuserData() async {
-    try {
-      // Get the current user ID
-      String userId = FirebaseAuth.instance.currentUser!.uid;
-
-      // Access the Firestore instance
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-      // Get the user document from Firestore using the current user ID
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await firestore
-          .collection(AuthConstants.kUsersCollection)
-          .doc(userId)
-          .get();
-
-      // Check if the document exists
-      if (documentSnapshot.exists) {
-        // Convert the document data to a User object
-        AuthModel authModel = AuthModel(
-          userName: documentSnapshot.data()![AuthConstants.kUserName],
-          email: documentSnapshot.data()![AuthConstants.kEmail],
-          phone: documentSnapshot.data()![AuthConstants.kPhone],
-        );
-        return authModel;
-      } else {
-        throw NoSavedUserException();
-      }
-    } catch (e) {
-      throw ServerException();
-    }
-  }
-
-  @override
   Future<Unit> setUserData(AuthModel authModel) async {
     try {
       // Get the current user ID
@@ -153,12 +124,16 @@ class AuthRemoteServicesFireBase implements AuthRemoteServices {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
       // Set the authData map to a document with the current user ID in a 'users' collection
-      await firestore
-          .collection(AuthConstants.kUsersCollection)
-          .doc(userId)
-          .set({
-        AuthConstants.kUserName: authData[AuthConstants.kUserName],
-        AuthConstants.kEmail: authData[AuthConstants.kEmail],
+      await firestore.collection(KConstants.kUsersCollection).doc(userId).set({
+        KConstants.kUserName: authData[KConstants.kUserName],
+        KConstants.kEmail: authData[KConstants.kEmail],
+        KConstants.kPhone: '',
+        KConstants.kProfileImageUrl: '',
+        KConstants.kBio: '',
+        KConstants.kUserId: userId,
+        KConstants.kNFollowers: '0',
+        KConstants.kNFollowing: '0',
+        KConstants.kNPosts: '0',
       });
 
       return Future.value(unit);

@@ -49,10 +49,12 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void emailAndPasswordLogIn({required AuthModel authEntity}) async {
+  void emailAndPasswordLogIn(
+      {required AuthModel authEntity, required String password}) async {
     emit(LoadingAuthState());
     final Either<Failure, Unit> failureOrSuccess =
-        await _emailAndPasswordLogInLogic(authEntity: authEntity);
+        await _emailAndPasswordLogInLogic(
+            authEntity: authEntity, password: password);
 
     failureOrSuccess.fold(
       (failure) => emit(ErrorAuthState(message: _mapFailureToMessage(failure))),
@@ -60,10 +62,11 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  void createAccount({required AuthModel authEntity}) async {
+  void createAccount(
+      {required AuthModel authEntity, required String password}) async {
     emit(LoadingAuthState());
     final Either<Failure, Unit> failureOrSuccess =
-        (await _createAccountLogic(authEntity: authEntity));
+        (await _createAccountLogic(authEntity: authEntity, password: password));
 
     failureOrSuccess.fold(
       (failure) => emit(ErrorAuthState(message: _mapFailureToMessage(failure))),
@@ -101,16 +104,16 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<Either<Failure, Unit>> _createAccountLogic(
-      {required AuthModel authEntity}) async {
+      {required AuthModel authEntity, required String password}) async {
     if (await networkConnectionChecker.isConnected) {
       try {
         AuthModel authModel = AuthModel(
             userName: authEntity.userName ?? '',
             email: authEntity.email,
-            password: authEntity.password ?? '',
             phone: authEntity.phone ?? '');
 
-        await authRemoteServices.createAccount(authModel);
+        await authRemoteServices.createAccount(
+            email: authModel.email, password: password);
 
         await authRemoteServices.setUserData(authModel);
         await authLocalServices.setUserData(authModel);
@@ -130,17 +133,16 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<Either<Failure, Unit>> _emailAndPasswordLogInLogic(
-      {required AuthModel authEntity}) async {
+      {required AuthModel authEntity, required String password}) async {
     if (await networkConnectionChecker.isConnected) {
       try {
         AuthModel authModel = AuthModel(
             userName: authEntity.userName ?? '',
             email: authEntity.email,
-            password: authEntity.password ?? '',
             phone: authEntity.phone ?? '');
 
         await authRemoteServices
-            .emailAndPasswordLogIn(authModel)
+            .emailAndPasswordLogIn(email: authModel.email, password: password)
             .then((value) async {
           await authLocalServices.setUserData(authModel);
           await authLocalServices.setIsUserLoggedIn(isUserLoggedIn: true);
@@ -165,10 +167,10 @@ class AuthCubit extends Cubit<AuthState> {
         UserCredential userCredential =
             await authRemoteServices.faceBookLogIn();
         AuthModel authModel = AuthModel(
-            userName: userCredential.user!.displayName ?? '',
-            email: userCredential.user!.email!,
-            phone: userCredential.user!.phoneNumber ?? '',
-            password: '');
+          userName: userCredential.user!.displayName ?? '',
+          email: userCredential.user!.email!,
+          phone: userCredential.user!.phoneNumber ?? '',
+        );
         await authRemoteServices.setUserData(authModel);
         await authLocalServices.setUserData(authModel);
         await authLocalServices.setIsUserLoggedIn(isUserLoggedIn: true);

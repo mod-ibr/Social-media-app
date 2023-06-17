@@ -241,16 +241,16 @@ class _LogInViewBodyState extends State<LogInViewBody> {
               (emailController.text.isEmpty || passwordController.text.isEmpty)
                   ? Colors.white70
                   : Colors.white,
-          onPress: () {
+          onPress: () async {
             if (formKey.currentState!.validate()) {
               formKey.currentState?.save();
 
               final authEntity = AuthModel(
-                  email: emailController.text,
-                  password: passwordController.text);
+                email: emailController.text,
+              );
 
-              BlocProvider.of<AuthCubit>(context)
-                  .emailAndPasswordLogIn(authEntity: authEntity);
+                BlocProvider.of<AuthCubit>(context).emailAndPasswordLogIn(
+                  authEntity: authEntity, password: passwordController.text);
             }
           },
         ),
@@ -259,7 +259,6 @@ class _LogInViewBodyState extends State<LogInViewBody> {
           text: 'Continue with Google',
           imageName: 'google.png',
           onPress: () {
-            print('##### Google');
             BlocProvider.of<AuthCubit>(context).googleLogIn();
           },
           bckcolor: Colors.white,
@@ -269,7 +268,6 @@ class _LogInViewBodyState extends State<LogInViewBody> {
         CustomButtonSocial(
           onPress: () {
             BlocProvider.of<AuthCubit>(context).faceBookLogIn();
-            print('##### Facebook');
           },
           bckcolor: Colors.blue[600]!,
           tColor: Colors.white,

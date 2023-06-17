@@ -43,12 +43,12 @@ class FaceBookLogInFailure extends Failure {
 }
 // Maps Failure
 
-class CamPosLocNotFoundFailure extends Failure {
+class SearchFailure extends Failure {
   @override
   List<Object?> get props => [];
 }
 
-class CamPosLocErrorFailure extends Failure {
+class EmptySearchFailure extends Failure {
   @override
   List<Object?> get props => [];
 }
