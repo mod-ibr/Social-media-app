@@ -5,12 +5,16 @@ import 'package:instagram/Core/Errors/failures.dart';
 import 'package:instagram/Core/Widgets/custom_text.dart';
 import 'package:instagram/Core/Widgets/loading_widget.dart';
 import 'package:instagram/Features/Auth/Model/auth_model.dart';
+import 'package:instagram/Features/Instagram/View/Widgets/ProfileTapViewWidgets/edit_profile_page.dart';
 import 'package:instagram/Features/Instagram/ViewModel/ProfileViewtabModelView/profile_view_tab_cubit.dart';
 
 import '../../../../../Core/Errors/errors_strings.dart';
+import '../../../../../Core/Utils/Functions/animated_navigation.dart';
 
 class ProfileTabViewBody extends StatefulWidget {
-  const ProfileTabViewBody({Key? key}) : super(key: key);
+  final bool isCurrentUser;
+  const ProfileTabViewBody({Key? key, this.isCurrentUser = true})
+      : super(key: key);
 
   @override
   State<ProfileTabViewBody> createState() => _ProfileTabViewBodyState();
@@ -62,9 +66,7 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
             } else if (state is SucceededGetUserDataState) {
               return succeddedWidget(size: size, userData: state.userData);
             }
-            return failureWidget(
-                text: ErrorsStrings.serverFailureMessage,
-                icon: Icons.miscellaneous_services_rounded);
+            return const LoadingWidget();
           },
         ),
       ),
@@ -73,19 +75,23 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
 
   Widget failureWidget({required String text, required IconData icon}) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CustomText(
-            text: text,
-            color: Colors.red,
-          ),
-          Icon(
-            icon,
-            color: Colors.red,
-          ),
-        ],
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CustomText(
+              text: text,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 20),
+            Icon(
+              icon,
+              color: Colors.red,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -102,11 +108,11 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // User name Bar
-                _usernameBar(email: userData.email),
+                _usernameBar(userName: userData.userName!),
                 // profile image and account detailes bar
                 _profileDetailes(
                     imgUrl: userData.profileImgUrl!,
-                    name: userData.userName!,
+                    name: userData.name!,
                     nFollowers: userData.nFollowers!,
                     nFollowing: userData.nFollowing!,
                     nPosts: userData.nPosts!),
@@ -153,8 +159,7 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
     );
   }
 
-  Widget _usernameBar({required String email}) {
-    String userName = email.split('@')[0];
+  Widget _usernameBar({required String userName}) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 10),
       child: Row(
@@ -222,55 +227,58 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
       height: 100,
       child: Row(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 38,
-                  backgroundColor: const Color(0xffdbdbdb),
+          Column(
+            children: [
+              CircleAvatar(
+                radius: 38,
+                backgroundColor: const Color(0xffdbdbdb),
+                child: CircleAvatar(
+                  radius: 37,
+                  backgroundColor: const Color(0xfff8f7f1),
                   child: CircleAvatar(
-                    radius: 37,
-                    backgroundColor: const Color(0xfff8f7f1),
-                    child: CircleAvatar(
-                      backgroundColor: const Color(0xffdbdbdb),
-                      radius: 35,
-                      child: ClipOval(
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        child: CachedNetworkImage(
-                          imageUrl: imgUrl,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          placeholder: (context, url) {
-                            if (url.isEmpty) {
-                              return const Icon(
-                                Icons.person_rounded,
-                                size: 40,
-                                color: Colors.white,
-                              );
-                            }
-                            return const CircularProgressIndicator();
-                          },
-                          errorWidget: (context, url, error) => const Icon(
-                            Icons.person_rounded,
-                            size: 40,
-                            color: Colors.white,
-                          ),
+                    backgroundColor: const Color(0xffdbdbdb),
+                    radius: 35,
+                    child: ClipOval(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      child: CachedNetworkImage(
+                        imageUrl: imgUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        placeholder: (context, url) {
+                          if (url.isEmpty) {
+                            return const Icon(
+                              Icons.person_rounded,
+                              size: 40,
+                              color: Colors.white,
+                            );
+                          }
+                          return Container(
+                            alignment: Alignment.center,
+                            width: 50,
+                            height: 50,
+                            child: const CircularProgressIndicator(),
+                          );
+                        },
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.person_rounded,
+                          size: 40,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: CustomText(
-                    text: name,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0),
+                child: CustomText(
+                  text: name,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(width: 30),
           Expanded(
@@ -326,7 +334,7 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
 
   Widget _bio({required String bio}) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 5),
       child: CustomText(
         color: Colors.black,
         fontSize: 15,
@@ -349,7 +357,10 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffefefef), // background
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  AnimatedNavigation().navigateAndPush(
+                      widget: const EditProfilePage(), context: context);
+                },
                 child: const CustomText(
                   alignment: Alignment.center,
                   text: "Edit profile",
@@ -358,20 +369,23 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    backgroundColor: const Color(0xffefefef), // background
-                  ),
-                  onPressed: () {},
-                  child: const Icon(
-                    Icons.person_add_alt,
-                    color: Colors.black,
-                    size: 20,
-                  )),
-            )
+            (!widget.isCurrentUser)
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          backgroundColor:
+                              const Color(0xffefefef), // background
+                        ),
+                        onPressed: () {},
+                        child: const Icon(
+                          Icons.person_add_alt,
+                          color: Colors.black,
+                          size: 20,
+                        )),
+                  )
+                : const SizedBox()
           ],
         ),
       ),
@@ -473,7 +487,12 @@ class _ProfileTabViewBodyState extends State<ProfileTabViewBody>
                       color: Colors.white,
                     );
                   }
-                  return const CircularProgressIndicator();
+                  return Container(
+                    alignment: Alignment.center,
+                    width: 50,
+                    height: 50,
+                    child: const CircularProgressIndicator(),
+                  );
                 },
                 errorWidget: (context, url, error) => const Icon(
                   Icons.person_rounded,

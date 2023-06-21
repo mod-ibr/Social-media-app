@@ -249,7 +249,7 @@ class _LogInViewBodyState extends State<LogInViewBody> {
                 email: emailController.text,
               );
 
-                BlocProvider.of<AuthCubit>(context).emailAndPasswordLogIn(
+              BlocProvider.of<AuthCubit>(context).emailAndPasswordLogIn(
                   authEntity: authEntity, password: passwordController.text);
             }
           },
@@ -295,8 +295,8 @@ class _LogInViewBodyState extends State<LogInViewBody> {
             ),
             GestureDetector(
               onTap: () {
-                AnimatedNavigation()
-                    .navigate(widget: const SignUpView(), context: context);
+                AnimatedNavigation().navigateAndRemoveUntil(
+                    widget: const SignUpView(), context: context);
               },
               child: Container(
                 alignment: Alignment.center,

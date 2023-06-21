@@ -41,7 +41,7 @@ class CustomButton extends StatelessWidget {
                   .showSuccessAwesomeDialog(
                       message: 'logged in successfully', context: context)
                   .then((value) {
-                AnimatedNavigation().navigate(
+                AnimatedNavigation().navigateAndRemoveUntil(
                     widget: const HomeView(), context: context);
               });
             } else if (state is ErrorAuthState) {

@@ -16,8 +16,8 @@ class LogOut extends StatelessWidget {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is SucceededAuthState) {
-            AnimatedNavigation()
-                .navigate(widget: const LogInView(), context: context);
+            AnimatedNavigation().navigateAndRemoveUntil(
+                widget: const LogInView(), context: context);
           }
         },
         builder: (context, state) {

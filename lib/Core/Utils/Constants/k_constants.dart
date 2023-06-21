@@ -21,4 +21,10 @@ abstract class KConstants {
   static const kNFollowers = 'nFollowers';
   static const kNFollowing = 'nFollowing';
   static const kNPosts = 'nPosts';
+  static const kName = 'name';
+
+  static const KStorageProfileFolder = 'profile_img';
+  static const KStoragePostFolder = 'post_img';
+
+  static const KProfilePageNumber = 5;
 }

@@ -22,15 +22,15 @@ class HomeViewOrAuthView extends StatelessWidget {
           Future.delayed(
             Duration.zero,
             () {
-              AnimatedNavigation()
-                  .navigate(widget: const HomeView(), context: context);
+              AnimatedNavigation().navigateAndRemoveUntil(
+                  widget: const HomeView(), context: context);
             },
           );
         } else if (state is NotLoggedInState) {
           // Schedule navigation to occur after the widget tree has finished building
           Future.delayed(Duration.zero, () {
-            AnimatedNavigation()
-                .navigate(widget: const LogInView(), context: context);
+            AnimatedNavigation().navigateAndRemoveUntil(
+                widget: const LogInView(), context: context);
           });
         }
         return const LoadingWidget();

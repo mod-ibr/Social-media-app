@@ -9,21 +9,22 @@ import 'package:instagram/Features/Instagram/View/HomeViewTaps/search_tap_view.d
 import 'log_out.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  const HomeView({super.key, this.customPage});
+  final int? customPage;
 
   @override
   State<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  // final user = FirebaseAuth.instance.currentUser!;
   int _page = 0;
   late PageController pageController;
 
   @override
   void initState() {
     super.initState();
-    pageController = PageController();
+    pageController = PageController(
+        initialPage: (widget.customPage != null) ? widget.customPage! : _page);
   }
 
   @override

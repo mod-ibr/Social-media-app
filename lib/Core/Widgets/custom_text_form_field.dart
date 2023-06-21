@@ -53,22 +53,3 @@ class CustomTextFormField extends StatelessWidget {
     );
   }
 }
-
-
-/*
-
-(isPasswordField)
-              ? InkWell(
-                  onTap: () => toggelPasswordFunction!(),
-                  child: (isPasswordVisible)
-                      ? Icon(
-                          Icons.visibility,
-                          color: ColorConstants.buttonColor2,
-                        )
-                      : Icon(
-                          Icons.visibility_off,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                )
-              : null
- */

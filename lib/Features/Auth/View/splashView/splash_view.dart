@@ -25,8 +25,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(const Duration(seconds: KConstants.kSplashScreenDurationInSecond),
         () {
-      AnimatedNavigation()
-          .navigate(widget: const HomeViewOrAuthView(), context: context);
+      AnimatedNavigation().navigateAndRemoveUntil(
+          widget: const HomeViewOrAuthView(), context: context);
     });
   }
 

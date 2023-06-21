@@ -1,7 +1,9 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:instagram/Core/Errors/exception.dart';
-
+import 'package:path/path.dart' as path;
 import '../../Features/Auth/Model/auth_model.dart';
 import '../Utils/Constants/k_constants.dart';
 
@@ -9,14 +11,30 @@ abstract class InstaRemoteServices {
   Future<AuthModel> getuserData();
 
   Future<List<AuthModel>> getUsersByUserName(String name);
+  Future<String> uploadImageToStorage(
+      {required File imageFile, required String storageFolder});
+  Future<void> updateUserData(
+      {required String userName, required String name, required String bio});
+  Future<void> updateProfileImgUrlData({required String imgUrl});
+  Future<void> removeImageFromStorageByUrl({required String imageURL});
 }
 
 class InstaRemoteServicesFireBase implements InstaRemoteServices {
+  String getCurrentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+
+  String getImageFileName(File imageFile) {
+    String filePath = imageFile.path;
+    String fileName = path.basename(filePath);
+    return fileName;
+  }
+
   @override
   Future<AuthModel> getuserData() async {
     try {
       // Get the current user ID
-      String userId = FirebaseAuth.instance.currentUser!.uid;
+      String userId = getCurrentUserId();
 
       // Access the Firestore instance
       FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -40,6 +58,7 @@ class InstaRemoteServicesFireBase implements InstaRemoteServices {
           nFollowers: documentSnapshot.data()![KConstants.kNFollowers],
           nFollowing: documentSnapshot.data()![KConstants.kNFollowing],
           nPosts: documentSnapshot.data()![KConstants.kNPosts],
+          name: documentSnapshot.data()![KConstants.kName],
         );
         return authModel;
       } else {
@@ -69,6 +88,97 @@ class InstaRemoteServicesFireBase implements InstaRemoteServices {
       return users;
     } catch (e) {
       throw SearchException();
+    }
+  }
+
+  @override
+  Future<String> uploadImageToStorage(
+      {required File imageFile, required String storageFolder}) async {
+    try {
+      // Get the current user's ID
+      String userId = getCurrentUserId();
+      String imageName = getImageFileName(imageFile);
+      // Create a reference to the profile_img file in Firebase Storage
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child(KConstants.KStorageProfileFolder)
+          .child('${userId}_$imageName.jpg');
+
+      // Upload the image file to Firebase Storage
+      await ref.putFile(imageFile);
+
+      // Retrieve the download URL for the uploaded image
+      String downloadURL = await ref.getDownloadURL();
+
+      return downloadURL;
+    } catch (e) {
+      print('Error uploading image to Firebase Storage: $e');
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> updateUserData({
+    required String userName,
+    required String name,
+    required String bio,
+  }) async {
+    try {
+      String userId = getCurrentUserId();
+
+      // Get the reference to the user's document
+      DocumentReference userDocRef = FirebaseFirestore.instance
+          .collection(KConstants.kUsersCollection)
+          .doc(userId);
+
+      // Update the document data
+      await userDocRef.update({
+        KConstants.kUserName: userName,
+        KConstants.kName: name,
+        KConstants.kBio: bio,
+      });
+
+      print('User data updated successfully! from Remote Server');
+    } catch (e) {
+      print('Error updating user data: $e');
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> removeImageFromStorageByUrl({required String imageURL}) async {
+    try {
+      // Create a reference to the image file in Firebase Storage
+      firebase_storage.Reference ref =
+          firebase_storage.FirebaseStorage.instance.refFromURL(imageURL);
+
+      // Delete the image file from Firebase Storage
+      await ref.delete();
+
+      print('Profile image removed from Firebase Storage successfully!');
+    } catch (e) {
+      print('Error removing profile image from Firebase Storage: $e');
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> updateProfileImgUrlData({required String imgUrl}) async {
+    try {
+      String userId = getCurrentUserId();
+
+      // Get the reference to the user's document
+      DocumentReference userDocRef = FirebaseFirestore.instance
+          .collection(KConstants.kUsersCollection)
+          .doc(userId);
+
+      // Update the document data
+      await userDocRef.update({KConstants.kProfileImageUrl: imgUrl});
+
+      print(' Profile Img Url  data updated successfully! from Remote Server');
+    } catch (e) {
+      print('Error updating user data: $e');
+      throw ServerException();
     }
   }
 }

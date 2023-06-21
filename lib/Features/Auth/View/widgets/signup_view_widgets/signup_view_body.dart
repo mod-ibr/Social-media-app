@@ -99,8 +99,8 @@ class _SignUpViewBodyState extends State<SignUpViewBody> {
             ),
             GestureDetector(
               onTap: () {
-                AnimatedNavigation()
-                    .navigate(widget: const LogInView(), context: context);
+                AnimatedNavigation().navigateAndRemoveUntil(
+                    widget: const LogInView(), context: context);
               },
               child: Container(
                 alignment: Alignment.center,
@@ -210,7 +210,8 @@ class _SignUpViewBodyState extends State<SignUpViewBody> {
                   ? ColorConstants.buttonDisableColor
                   : ColorConstants.buttonColor,
               onPress: () {
-                if (formKey.currentState!.validate()) {                  formKey.currentState?.save();
+                if (formKey.currentState!.validate()) {
+                  formKey.currentState?.save();
                   final authEntity = AuthModel(
                     userName: userNameController.text,
                     email: emailController.text,

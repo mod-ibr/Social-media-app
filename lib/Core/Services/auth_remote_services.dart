@@ -122,10 +122,11 @@ class AuthRemoteServicesFireBase implements AuthRemoteServices {
 
       // Access the Firestore instance
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-
+      String _username = authData[KConstants.kEmail].toString().split('@')[0];
       // Set the authData map to a document with the current user ID in a 'users' collection
       await firestore.collection(KConstants.kUsersCollection).doc(userId).set({
-        KConstants.kUserName: authData[KConstants.kUserName],
+        KConstants.kUserName: _username,
+        KConstants.kName: authData[KConstants.kUserName],
         KConstants.kEmail: authData[KConstants.kEmail],
         KConstants.kPhone: '',
         KConstants.kProfileImageUrl: '',
